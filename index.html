@@ -1,0 +1,188 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Yiddish vocabulary list</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/floatthead/2.2.4/jquery.floatThead.min.js"></script>
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+
+    </head>
+    <style>
+     .text_select {
+         width: 10%;
+     }
+
+     .text_select:after {
+         content: "";
+     }
+
+     table {
+         width: 100%;
+     }
+
+     /* set background color so it's not transparent when scrolling down */
+     th {
+         background: #f5f5f5;
+     }
+
+     /* however it computes the height of this is too small and so there's a
+        scroll bar, so we set this to 50 because that's big enough that we don't
+        have any problems. */
+     .floatThead-container {
+         height: 50px;
+     }
+
+     /* add arrows, from https://stackoverflow.com/questions/17639562/add-sorting-arrows-to-th-like-table-sorter */
+     .headerSortDown:after,
+     .headerSortUp:after {
+         content: ' ';
+         position: relative;
+         left: 2px;
+         border: 6px solid transparent;
+     }
+
+     /* height of the element that contains this is too small, so we get a scroll bar. figure out how to remove that */
+     .headerSortDown:after {
+         top: 15px;
+         border-top-color: silver;
+     }
+
+     .headerSortUp:after {
+         bottom: 15px;
+         border-bottom-color: silver;
+     }
+
+     .headerSortDown,
+     .headerSortUp {
+         padding-right: 10px;
+         cursor: pointer;
+     }
+
+     .header_label {
+         margin-left: 1%;
+     }
+
+     .row-hidden {
+         border: 1px solid #ddd;
+         background-color: red;
+         display: none;
+     }
+    </style>
+    <body>
+        <h1>Yiddish vocabulary lists</h1>
+        <div id='text-select'>
+            <label for="collection_select" class="header_label">Collection:</label>
+            <select name="collection_select" class="text_select" onchange="select_collection(event)"></select>
+            <label for="title_select" class="header_label">Title:</label>
+            <select name="title_select" class="text_select" onchange="select_title(event)"></select>
+        </div>
+
+        <div class="well">
+            <div class="row" id="vocab-display">
+                <table  class="table table-condensed table-hover table-striped" id="vocabulary-table">
+                    <colgroup> <col> <col> <col> <col> <col> <col> </colgroup>
+                    <thead>
+                        <tr>
+                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">INDEX</th>
+                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">WORD</th>
+                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">COUNT (STORY)</th>
+                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">FREQ (STORY)</th>
+                            <th>WIKTIONARY</th>
+                            <th>KENTUCKY</th>
+                        </tr>
+                        <tbody></tbody>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+    </body>
+    <script>
+     function generate_html_table(data) {
+         var table = ''
+         index = 0
+         $.each(data['words'], function(word, data) {
+             console.log(data)
+             table += '<tr>';
+             table += '<td>' + data['index'][0] + '</td>'
+             table += '<td>' + word + '</td>'
+             table += '<td>' + data['count (story)'] + '</td>'
+             table += '<td>' + (100 * parseFloat(data['frequency (story)'])).toFixed(2) + '%</td>'
+             table += '<td>' + data['wiktionary'] + '</td>'
+             table += '<td>' + data['kentucky'] + '</td>'
+             table += '</tr>';
+             // index++;
+             if (index > 10) {
+                 return false
+             }
+         });
+         $('#vocabulary-table > tbody:last-child').append(table);
+         $('#vocabulary-table').floatThead();
+
+     }
+     // sort solution from https://stackoverflow.com/questions/59282842/how-to-make-sorting-html-tables-faster
+     function sortTableRowsByColumn( table, columnIndex, ascending ) {
+
+         // only look at visible rows
+         const rows = $('tbody > tr').filter(":visible");
+         rows.sort( ( x, y ) => {
+             var xValue = x.cells[columnIndex].textContent;
+             // this should catch undefined, null, empty, and 0.
+             // https://www.w3docs.com/snippets/javascript/how-to-check-for-empty-undefined-null-string-in-javascript.html
+             if (!xValue) {
+                 // want undefined to always be at the end.
+                 xValue = ascending ?  Infinity : 0;
+             }
+             var yValue = y.cells[columnIndex].textContent;
+             if (!yValue) {
+                 yValue = ascending ? Infinity : 0;
+             }
+             if (!isNaN(xValue)) {
+                 const xNum = parseFloat( xValue );
+                 const yNum = parseFloat( yValue );
+                 return ascending ? ( xNum - yNum ) : ( yNum - xNum );
+             } else {
+                 return ascending ? xValue.localeCompare(yValue) : yValue.localeCompare(xValue);
+             }
+         } );
+
+         for( let row of rows ) {
+             table.tBodies[0].appendChild( row );
+         }
+     }
+
+     function onColumnHeaderClicked( ev ) {
+         const th = ev.currentTarget;
+         const table = document.getElementById('vocabulary-table');
+         const thIndex = Array.from( th.parentElement.children ).indexOf( th );
+         const ascending = !( 'sort' in th.dataset ) || th.dataset.sort != 'asc';
+         if (ascending) {
+             th.classList.remove('headerSortDown');
+             th.classList.add('headerSortUp');
+         } else {
+             th.classList.remove('headerSortUp');
+             th.classList.add('headerSortDown');
+         }
+         const start = performance.now();
+         sortTableRowsByColumn( table, thIndex, ascending );
+         const end = performance.now();
+         console.log( "Sorted table rows in %d ms.",  end - start );
+         const allTh = table.querySelectorAll( ':scope > thead > tr > th' );
+         for( let th2 of allTh ) {
+             delete th2.dataset['sort'];
+         }
+         th.dataset['sort'] = ascending ? 'asc' : 'desc';
+     }
+
+     $.getJSON("https://raw.githubusercontent.com/billbrod/yiddish_wordlist_data/main/wordlists/di_heldn_fun_khelm/khelm_boyt_a_vasermil.json", function(data) {
+         generate_html_table(data)
+     })
+    </script>
+</html>
