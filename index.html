@@ -100,10 +100,14 @@
         </div>
         <div id='dictionaries'>
             <a>Dictionaries: </a>
-            <input type='checkbox' id='wikt_check' name='wikt_check' onclick="toggleDictionary(event)" checked>
+            <input type='checkbox' class='dict_check' id='wikt_check' name='wikt_check' onclick="toggleDictionary(event)" checked>
             <label for='wikt_check'>Wiktionary</label>
-            <input type='checkbox' id='ky_check' name='ky_check' onclick="toggleDictionary(event)" checked>
+            <input type='checkbox' class='dict_check' id='ky_check' name='ky_check' onclick="toggleDictionary(event)" checked>
             <label for='ky_check'>Kentucky</label>
+        </div>
+        <div id='more-options'>
+            <label for='hide_undef_check'>Hide words without definitions</label>
+            <input type='checkbox' id='hide_undef_check' name='hide_undef_check' onclick="toggleHideUndef()">
         </div>
         <div class="well">
             <div class="row" id="vocab-display">
@@ -126,15 +130,49 @@
 
     </body>
     <script>
-     function toggleDictionary(event) {
-         let inputVal = document.getElementById(event.target.id).checked;
-         let dict_name = event.target.id.replace('_check', '')
-         let dict_idx = Object({'wikt': 4, 'ky': 5})[dict_name]
+     function toggleHideUndef() {
+         let inputVal = document.getElementById('hide_undef_check').checked;
          if (inputVal) {
-             $(`td:nth-child(${dict_idx}),th:nth-child(${dict_idx})`).show();
+             // if the displayed dictionaries change, we'll need to show some of
+             // the currently-hidden rows
+             hide_classes = ''
+             unhide_classes = ''
+             let dicts = $('.dict_check').map(function(){
+                 return this.id.replace('_check', '')
+             }).get()
+             dicts.forEach(function(dict) {
+                 if (document.getElementById(`${dict}_check`).checked) {
+                    hide_classes += `.undef_${dict}`
+                 } else {
+                    unhide_classes += `.undef_${dict}`
+                 }
+             })
+             $(`tr${hide_classes}`).hide();
+             $(`tr${unhide_classes}`).show();
          } else {
-             $(`td:nth-child(${dict_idx}),th:nth-child(${dict_idx})`).hide();
+             $('tr').show();
          }
+     }
+     function toggleDictionary(event) {
+         let dict_id;
+         try{
+             dict_id = [event.target.id]
+         } catch (e) {
+             dict_id = $('.dict_check').map(function(){
+                 return this.id
+             }).get()
+         }
+         dict_id.forEach(function(did) {
+             let inputVal = document.getElementById(did).checked;
+             let dict_name = did.replace('_check', '')
+             let dict_idx = Object({'wikt': 4, 'ky': 5})[dict_name]
+             if (inputVal) {
+                 $(`td:nth-child(${dict_idx}),th:nth-child(${dict_idx})`).show();
+             } else {
+                 $(`td:nth-child(${dict_idx}),th:nth-child(${dict_idx})`).hide();
+             }
+         })
+         toggleHideUndef()
      }
      function format_ky_def(word) {
          word_str = '<span class="lexeme">' + word['lexeme'] + '</span>'
@@ -194,7 +232,6 @@
                  word_str += '<ul>'
                  $.each(def['examples'], function(i, ex_word) {
                      word_str += '<li>' + ex_word + '</li>'
-                     console.log(ex_word)
                  })
                  $.each(def['relatedWords'], function(i, ex_word) {
                      word_str += '<li>' + ex_word['words'] + '<span class="related">' + ex_word['relationshipType'] + '</span></li>'
@@ -210,8 +247,17 @@
      function generate_html_table(data) {
          var table = ''
          index = 0
+         console.log(data['פאַטש'])
          $.each(data['words'], function(word, word_data) {
-             table += '<tr>';
+             // console.log(word_data)
+             classes = ''
+             if (word_data['wiktionary'].length == 0) {
+                 classes += 'undef_wikt '
+             }
+             if (word_data['kentucky'].length == 0) {
+                 classes += 'undef_ky'
+             }
+             table += `<tr id="${word}" class="${classes}">`;
              table += '<td>' + word_data['index'][0] + '</td>'
              table += '<td>' + word_data['count (story)'] + '</td>'
              table += '<td>' + (100 * parseFloat(word_data['frequency (story)'])).toFixed(2) + '%</td>'
@@ -224,8 +270,12 @@
              table += '</td>'
              table += '<td>'
              table += '<ul>'
-             table += '<li><span class="transliteration">' + word_data['kentucky']['transliteration'] + '</span></li>'
-             table += '<li>stem: ' + word_data['kentucky']['stem'] + '</li>'
+             if (word_data['kentucky']['transliteration'] !== undefined) {
+                 table += '<li><span class="transliteration">' + word_data['kentucky']['transliteration'] + '</span></li>'
+             }
+             if (word_data['kentucky']['stem'] !== undefined) {
+                 table += '<li>stem: ' + word_data['kentucky']['stem'] + '</li>'
+             }
              table += '<ol>'
              if (word_data['kentucky']['definitions'] !== undefined) {
                  word_data['kentucky']['definitions'].sort(function(a, b){return a['lexeme'].length-b['lexeme'].length})
@@ -300,6 +350,9 @@
 
      $.getJSON("https://raw.githubusercontent.com/billbrod/yiddish_wordlist_data/main/wordlists/di_heldn_fun_khelm/khelm_boyt_a_vasermil.json", function(data) {
          generate_html_table(data)
+         // don't need to call toggleHideUndef, because it's called at the end
+         // of toggleDictionary
+         toggleDictionary()
      })
     </script>
 </html>
