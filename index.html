@@ -98,7 +98,13 @@
             <label for="title_select" class="header_label">Title:</label>
             <select name="title_select" class="text_select" onchange="select_title(event)"></select>
         </div>
-
+        <div id='dictionaries'>
+            <a>Dictionaries: </a>
+            <input type='checkbox' id='wikt_check' name='wikt_check' onclick="toggleDictionary(event)" checked>
+            <label for='wikt_check'>Wiktionary</label>
+            <input type='checkbox' id='ky_check' name='ky_check' onclick="toggleDictionary(event)" checked>
+            <label for='ky_check'>Kentucky</label>
+        </div>
         <div class="well">
             <div class="row" id="vocab-display">
                 <table  class="table table-condensed table-hover table-striped" id="vocabulary-table">
@@ -120,6 +126,16 @@
 
     </body>
     <script>
+     function toggleDictionary(event) {
+         let inputVal = document.getElementById(event.target.id).checked;
+         let dict_name = event.target.id.replace('_check', '')
+         let dict_idx = Object({'wikt': 4, 'ky': 5})[dict_name]
+         if (inputVal) {
+             $(`td:nth-child(${dict_idx}),th:nth-child(${dict_idx})`).show();
+         } else {
+             $(`td:nth-child(${dict_idx}),th:nth-child(${dict_idx})`).hide();
+         }
+     }
      function format_ky_def(word) {
          word_str = '<span class="lexeme">' + word['lexeme'] + '</span>'
          if (word['partOfSpeech'] !== null || word['participle'] !== null || word['gender'] !== null || word['plural'] !== null ) {
