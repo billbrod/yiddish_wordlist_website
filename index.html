@@ -74,6 +74,21 @@
          background-color: red;
          display: none;
      }
+
+     .lexeme {font-weight: bold;}
+     .definition:before {content: ": ";}
+     .grammar:before {content: " (";}
+     .grammar:after {content: ")";}
+     .participle:before {content: ", past participle: ";}
+     .gender:before {content: ", gender: ";}
+     .plural:before {content: ", plural: ";}
+     .transliteration:before {content: "transliteration: ";}
+     .pronunciation:before {content: ", pronunciation: ";}
+     .etymology:before {content: "Etymology: ";}
+     .usage_notes:before {content: "Usage notes: ";}
+     .related:before {content: " (";}
+     .related:after {content: ")";}
+
     </style>
     <body>
         <h1>Yiddish vocabulary lists</h1>
@@ -105,23 +120,112 @@
 
     </body>
     <script>
+     function format_ky_def(word) {
+         word_str = '<span class="lexeme">' + word['lexeme'] + '</span>'
+         if (word['partOfSpeech'] !== null || word['participle'] !== null || word['gender'] !== null || word['plural'] !== null ) {
+             word_str += '<span class="grammar">'
+             if (word['partOfSpeech'] !== null) {
+                 word_str += '<span class="pos">' + word['partOfSpeech'] + '</span>'
+             }
+             if (word['participle'] !== null) {
+                 word_str += '<span class="participle">' + word['participle'] + '</span>'
+             }
+             if (word['gender'] !== null) {
+                 word_str += '<span class="gender">' + word['gender'] + '</span>'
+             }
+             if (word['plural'] !== null) {
+                 word_str += '<span class="plural">' + word['plural'] + '</span>'
+             }
+             word_str += '</span>'
+         }
+         word_str += '<span class="definition">' + word['text'] + '</span>'
+         return word_str
+     }
+     function format_wikt_def(word) {
+         word_str = '<li>'
+         word_str += '<span class="transliteration">' + word['transliteration'].join(', ') + '</span>'
+         if (word['pronunciations'] !== null) {
+             word_str += '<span class="pronunciation">' + word['pronunciations'] + '</span>'
+         }
+         word_str += '<ul>'
+         if (word['etymology'].length > 0) {
+             word_str += '<li><span class="etymology">' + word['etymology'] + '</span></li>'
+         }
+         if (word['usage_notes'].length > 0 ) {
+             word_str += '<li><span class="usage_notes">' + word['usage_notes'] + '</span></li>'
+         }
+         word_str += '<ol>'
+         $.each(word['definitions'], function(idx, def) {
+             word_str += '<li>' + '<span class="lexeme">' + def['lexeme'] + '</span>'
+             if (def['partOfSpeech'] !== null || def['participle'] !== null || def['gender'] !== null || def['plural'] !== null ) {
+                 word_str += '<span class="grammar">'
+                 if (def['partOfSpeech'] !== null) {
+                     word_str += '<span class="pos">' + def['partOfSpeech'] + '</span>'
+                 }
+                 if (def['participle'] !== null) {
+                     word_str += '<span class="participle">' + def['participle'] + '</span>'
+                 }
+                 if (def['gender'] !== null) {
+                     word_str += '<span class="gender">' + def['gender'] + '</span>'
+                 }
+                 if (def['plural'] !== null) {
+                     word_str += '<span class="plural">' + def['plural'] + '</span>'
+                 }
+                 word_str += '</span>'
+             }
+             word_str += '<span class="definition">' + def['text'] + '</span>'
+             if (def['examples'].length > 0 || def['relatedWords'].length > 0) {
+                 word_str += '<ul>'
+                 $.each(def['examples'], function(i, ex_word) {
+                     word_str += '<li>' + ex_word + '</li>'
+                     console.log(ex_word)
+                 })
+                 $.each(def['relatedWords'], function(i, ex_word) {
+                     word_str += '<li>' + ex_word['words'] + '<span class="related">' + ex_word['relationshipType'] + '</span></li>'
+                 })
+                 word_str += '</ul>'
+             }
+             word_str += '</li>'
+         })
+         word_str += '</ol>'
+         word_str += '</ul>'
+         return word_str
+     }
      function generate_html_table(data) {
          var table = ''
          index = 0
-         $.each(data['words'], function(word, data) {
-             console.log(data)
+         $.each(data['words'], function(word, word_data) {
              table += '<tr>';
-             table += '<td>' + data['index'][0] + '</td>'
+             table += '<td>' + word_data['index'][0] + '</td>'
              table += '<td>' + word + '</td>'
-             table += '<td>' + data['count (story)'] + '</td>'
-             table += '<td>' + (100 * parseFloat(data['frequency (story)'])).toFixed(2) + '%</td>'
-             table += '<td>' + data['wiktionary'] + '</td>'
-             table += '<td>' + data['kentucky'] + '</td>'
-             table += '</tr>';
-             // index++;
-             if (index > 10) {
-                 return false
+             table += '<td>' + word_data['count (story)'] + '</td>'
+             table += '<td>' + (100 * parseFloat(word_data['frequency (story)'])).toFixed(2) + '%</td>'
+             table += '<td>'
+             table += '<ol>'
+             $.each(word_data['wiktionary'], function(idx, info) {
+                 table += format_wikt_def(info)
+             })
+             table += '</ol>'
+             table += '</td>'
+             table += '<td>'
+             table += '<ul>'
+             table += '<li><span class="transliteration">' + word_data['kentucky']['transliteration'] + '</span></li>'
+             table += '<li>stem: ' + word_data['kentucky']['stem'] + '</li>'
+             table += '<ol>'
+             if (word_data['kentucky']['definitions'] !== undefined) {
+                 word_data['kentucky']['definitions'].sort(function(a, b){return a['lexeme'].length-b['lexeme'].length})
+                 $.each(word_data['kentucky']['definitions'], function(idx, info) {
+                     table += '<li>' + format_ky_def(info) + '</li>'
+                 } )
              }
+             table += '</ol>'
+             table += '</ul>'
+             table += '</td>'
+             table += '</tr>';
+             index++;
+             // if (index > 10) {
+             //     return false
+             // }
          });
          $('#vocabulary-table > tbody:last-child').append(table);
          $('#vocabulary-table').floatThead();
