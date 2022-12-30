@@ -144,7 +144,7 @@
      function format_wikt_def(word) {
          word_str = '<li>'
          word_str += '<span class="transliteration">' + word['transliteration'].join(', ') + '</span>'
-         if (word['pronunciations'] !== null) {
+         if (word['pronunciations'].length > 0) {
              word_str += '<span class="pronunciation">' + word['pronunciations'] + '</span>'
          }
          word_str += '<ul>'
