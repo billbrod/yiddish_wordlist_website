@@ -106,11 +106,11 @@
                     <thead>
                         <tr>
                             <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">INDEX</th>
-                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">WORD</th>
                             <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">COUNT (STORY)</th>
                             <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">FREQ (STORY)</th>
                             <th>WIKTIONARY</th>
                             <th>KENTUCKY</th>
+                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">WORD</th>
                         </tr>
                         <tbody></tbody>
                     </thead>
@@ -197,7 +197,6 @@
          $.each(data['words'], function(word, word_data) {
              table += '<tr>';
              table += '<td>' + word_data['index'][0] + '</td>'
-             table += '<td>' + word + '</td>'
              table += '<td>' + word_data['count (story)'] + '</td>'
              table += '<td>' + (100 * parseFloat(word_data['frequency (story)'])).toFixed(2) + '%</td>'
              table += '<td>'
@@ -221,11 +220,9 @@
              table += '</ol>'
              table += '</ul>'
              table += '</td>'
+             table += '<td>' + word + '</td>'
              table += '</tr>';
              index++;
-             // if (index > 10) {
-             //     return false
-             // }
          });
          $('#vocabulary-table > tbody:last-child').append(table);
          $('#vocabulary-table').floatThead();
