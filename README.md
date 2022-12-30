@@ -6,7 +6,7 @@ TODO:
 - [X] get wiktionary entry working
 - [X] get kentucky entry working
 - [X] add toggle to hide words with no definitions
-- [ ] add total word count
+- [X] add total word count
 - [ ] add toggle to hide all but first definition / all examples
 - [X] add toggle for dictionaries
 - [ ] add exclude list (and button to add to it) (plus buttons to add examples)

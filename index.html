@@ -113,6 +113,10 @@
             <label for='hide_undef_check'>Hide words without definitions: </label>
             <input type='checkbox' id='hide_undef_check' name='hide_undef_check' onclick="toggleHideUndef()">
         </div>
+        <div>
+            <label for='total_words'>Words currently displayed: </label>
+            <span id='total_words' name='total_words'></span>
+        </div>
         <div class="well">
             <div class="row" id="vocab-display">
                 <table  class="table table-condensed table-hover table-striped" id="vocabulary-table">
@@ -134,6 +138,10 @@
 
     </body>
     <script>
+     function updateDisplayedWords() {
+         let displayedWords = $('tbody > tr:visible').length
+         $('#total_words').text(displayedWords)
+     }
      function toggleHideUndef() {
          let inputVal = document.getElementById('hide_undef_check').checked;
          if (inputVal) {
@@ -156,6 +164,7 @@
          } else {
              $('tr').show();
          }
+         updateDisplayedWords()
      }
      function toggleDictionary(event) {
          let dict_id;
@@ -251,7 +260,6 @@
      function generate_html_table(data) {
          var table = ''
          index = 0
-         console.log(data['פאַטש'])
          $.each(data['words'], function(word, word_data) {
              // console.log(word_data)
              classes = ''
