@@ -65,8 +65,12 @@
          cursor: pointer;
      }
 
-     .header_label {
+     .marg_left {
          margin-left: 1%;
+     }
+
+     .marg_right {
+         margin-right: 1%;
      }
 
      .row-hidden {
@@ -94,19 +98,19 @@
         <h1>Yiddish vocabulary lists</h1>
         <div id='text-select'>
             <label for="collection_select" class="header_label">Collection:</label>
-            <select name="collection_select" class="text_select" onchange="select_collection(event)"></select>
+            <select name="collection_select" class="text_select marg_right" onchange="select_collection(event)"></select>
             <label for="title_select" class="header_label">Title:</label>
-            <select name="title_select" class="text_select" onchange="select_title(event)"></select>
+            <select name="title_select" class="text_select marg_right" onchange="select_title(event)"></select>
         </div>
         <div id='dictionaries'>
             <a>Dictionaries: </a>
-            <input type='checkbox' class='dict_check' id='wikt_check' name='wikt_check' onclick="toggleDictionary(event)" checked>
+            <input type='checkbox' class='dict_check marg_left' id='wikt_check' name='wikt_check' onclick="toggleDictionary(event)" checked>
             <label for='wikt_check'>Wiktionary</label>
-            <input type='checkbox' class='dict_check' id='ky_check' name='ky_check' onclick="toggleDictionary(event)" checked>
+            <input type='checkbox' class='dict_check marg_left' id='ky_check' name='ky_check' onclick="toggleDictionary(event)" checked>
             <label for='ky_check'>Kentucky</label>
         </div>
         <div id='more-options'>
-            <label for='hide_undef_check'>Hide words without definitions</label>
+            <label for='hide_undef_check'>Hide words without definitions: </label>
             <input type='checkbox' id='hide_undef_check' name='hide_undef_check' onclick="toggleHideUndef()">
         </div>
         <div class="well">
