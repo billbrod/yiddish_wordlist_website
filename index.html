@@ -109,9 +109,13 @@
             <input type='checkbox' class='dict_check marg_left' id='ky_check' name='ky_check' onclick="toggleDictionary(event)" checked>
             <label for='ky_check'>Kentucky</label>
         </div>
-        <div id='more-options'>
+        <div id='hide_undef'>
             <label for='hide_undef_check'>Hide words without definitions: </label>
             <input type='checkbox' id='hide_undef_check' name='hide_undef_check' onclick="toggleHideUndef()">
+        </div>
+        <div id='hide_extra_defs'>
+            <label for='hide_extra_def_check'>Hide definitions beyond the first and examples: </label>
+            <input type='checkbox' id='hide_extra_def_check' name='hide_extra_def_check' onclick="toggleHideExtraDefs()">
         </div>
         <div>
             <label for='total_words'>Words currently displayed: </label>
@@ -138,6 +142,18 @@
 
     </body>
     <script>
+     function toggleHideExtraDefs() {
+         let inputVal = document.getElementById('hide_extra_def_check').checked;
+         if (inputVal) {
+             $('.extra_definition').parent().hide()
+             $('.example').parent().hide()
+             $('.related').parent().hide()
+         } else {
+             $('.extra_definition').parent().show()
+             $('.example').parent().show()
+             $('.related').parent().show()
+         }
+     }
      function updateDisplayedWords() {
          let displayedWords = $('tbody > tr:visible').length
          $('#total_words').text(displayedWords)
@@ -187,7 +203,7 @@
          })
          toggleHideUndef()
      }
-     function format_ky_def(word) {
+     function format_ky_def(idx, word) {
          word_str = '<span class="lexeme">' + word['lexeme'] + '</span>'
          if (word['partOfSpeech'] !== null || word['participle'] !== null || word['gender'] !== null || word['plural'] !== null ) {
              word_str += '<span class="grammar">'
@@ -205,7 +221,11 @@
              }
              word_str += '</span>'
          }
-         word_str += '<span class="definition">' + word['text'] + '</span>'
+         classes = 'definition'
+         if (idx > 0) {
+             classes += ' extra_definition'
+         }
+         word_str += `<span class="${classes}">${word['text']}</span>`
          return word_str
      }
      function format_wikt_def(word) {
@@ -240,14 +260,18 @@
                  }
                  word_str += '</span>'
              }
-             word_str += '<span class="definition">' + def['text'] + '</span>'
+             classes = 'definition'
+             if (idx > 0) {
+                 classes += ' extra_definition'
+             }
+             word_str += `<span class="${classes}">${def['text']}</span>`
              if (def['examples'].length > 0 || def['relatedWords'].length > 0) {
                  word_str += '<ul>'
                  $.each(def['examples'], function(i, ex_word) {
-                     word_str += '<li>' + ex_word + '</li>'
+                     word_str += `<li><span class="example">${ex_word}</span></li>`
                  })
                  $.each(def['relatedWords'], function(i, ex_word) {
-                     word_str += '<li>' + ex_word['words'] + '<span class="related">' + ex_word['relationshipType'] + '</span></li>'
+                     word_str += `<li>${ex_word['words']}<span class="related">${ex_word['relationshipType']}</span></li>`
                  })
                  word_str += '</ul>'
              }
@@ -292,7 +316,7 @@
              if (word_data['kentucky']['definitions'] !== undefined) {
                  word_data['kentucky']['definitions'].sort(function(a, b){return a['lexeme'].length-b['lexeme'].length})
                  $.each(word_data['kentucky']['definitions'], function(idx, info) {
-                     table += '<li>' + format_ky_def(info) + '</li>'
+                     table += '<li>' + format_ky_def(idx, info) + '</li>'
                  } )
              }
              table += '</ol>'
@@ -365,6 +389,7 @@
          // don't need to call toggleHideUndef, because it's called at the end
          // of toggleDictionary
          toggleDictionary()
+         toggleHideExtraDefs()
      })
     </script>
 </html>
