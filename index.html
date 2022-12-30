@@ -159,8 +159,8 @@
                     unhide_classes += `.undef_${dict}`
                  }
              })
-             $(`tr${hide_classes}`).hide();
              $(`tr${unhide_classes}`).show();
+             $(`tr${hide_classes}`).hide();
          } else {
              $('tr').show();
          }
@@ -269,7 +269,7 @@
              if (word_data['kentucky'].length == 0) {
                  classes += 'undef_ky'
              }
-             table += `<tr id="${word}" class="${classes}">`;
+             table += `<tr id="${word}" class="${classes.trim()}">`;
              table += '<td>' + word_data['index'][0] + '</td>'
              table += '<td>' + word_data['count (story)'] + '</td>'
              table += '<td>' + (100 * parseFloat(word_data['frequency (story)'])).toFixed(2) + '%</td>'
