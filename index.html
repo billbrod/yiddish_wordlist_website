@@ -15,10 +15,6 @@
 
     </head>
     <style>
-     .text_select {
-         width: 10%;
-     }
-
      .text_select:after {
          content: "";
      }
@@ -98,9 +94,9 @@
         <h1>Yiddish vocabulary lists</h1>
         <div id='text-select'>
             <label for="collection_select" class="header_label">Collection:</label>
-            <select name="collection_select" class="text_select marg_right" onchange="select_collection(event)"></select>
+            <select name="collection_select" id='collection_select' class="text_select marg_right" onchange="select_collection()"></select>
             <label for="title_select" class="header_label">Title:</label>
-            <select name="title_select" class="text_select marg_right" onchange="select_title(event)"></select>
+            <select name="title_select" id='title_select' class="text_select marg_right" onchange="create_table()"></select>
         </div>
         <div id='dictionaries'>
             <a>Dictionaries: </a>
@@ -142,6 +138,18 @@
 
     </body>
     <script>
+     function select_collection() {
+         let collection = $('#collection_select')[0].value;
+         $('#title_select').empty()
+         Object.keys(window.contents[collection]).forEach(function(title) {
+             $('#title_select').append($('<option>', {
+                 value: title,
+                 text: `${title}`
+             }))
+         })
+         create_table()
+     }
+
      function toggleHideExtraDefs() {
          let inputVal = document.getElementById('hide_extra_def_check').checked;
          if (inputVal) {
@@ -204,7 +212,7 @@
          toggleHideUndef()
      }
      function format_ky_def(idx, word) {
-         word_str = '<span class="lexeme">' + word['lexeme'] + '</span>'
+         let word_str = '<span class="lexeme">' + word['lexeme'] + '</span>'
          if (word['partOfSpeech'] !== null || word['participle'] !== null || word['gender'] !== null || word['plural'] !== null ) {
              word_str += '<span class="grammar">'
              if (word['partOfSpeech'] !== null) {
@@ -221,7 +229,7 @@
              }
              word_str += '</span>'
          }
-         classes = 'definition'
+         let classes = 'definition'
          if (idx > 0) {
              classes += ' extra_definition'
          }
@@ -229,7 +237,7 @@
          return word_str
      }
      function format_wikt_def(word) {
-         word_str = '<li>'
+         let word_str = '<li>'
          word_str += '<span class="transliteration">' + word['transliteration'].join(', ') + '</span>'
          if (word['pronunciations'].length > 0) {
              word_str += '<span class="pronunciation">' + word['pronunciations'] + '</span>'
@@ -260,7 +268,7 @@
                  }
                  word_str += '</span>'
              }
-             classes = 'definition'
+             let classes = 'definition'
              if (idx > 0) {
                  classes += ' extra_definition'
              }
@@ -283,10 +291,9 @@
      }
      function generate_html_table(data) {
          var table = ''
-         index = 0
+         let index = 0
          $.each(data['words'], function(word, word_data) {
-             // console.log(word_data)
-             classes = ''
+             let classes = ''
              if (word_data['wiktionary'].length == 0) {
                  classes += 'undef_wikt '
              }
@@ -384,12 +391,29 @@
          th.dataset['sort'] = ascending ? 'asc' : 'desc';
      }
 
-     $.getJSON("https://raw.githubusercontent.com/billbrod/yiddish_wordlist_data/main/wordlists/di_heldn_fun_khelm/khelm_boyt_a_vasermil.json", function(data) {
-         generate_html_table(data)
-         // don't need to call toggleHideUndef, because it's called at the end
-         // of toggleDictionary
-         toggleDictionary()
-         toggleHideExtraDefs()
+     function create_table() {
+         let collection = $('#collection_select')[0].value;
+         let title = $('#title_select')[0].value;
+         url = window.contents[collection][title]
+         $.getJSON(url, function(wordlist) {
+             generate_html_table(wordlist)
+             // don't need to call toggleHideUndef, because it's called at the end
+             // of toggleDictionary
+             toggleDictionary()
+             toggleHideExtraDefs()
+         })
+     }
+
+     $.getJSON("https://raw.githubusercontent.com/billbrod/yiddish_wordlist_data/main/contents.json", function(data) {
+         window.contents = data;
+         $('#collection_select').empty()
+         Object.keys(data).forEach(function(coll) {
+             $('#collection_select').append($('<option>', {
+                 value: coll,
+                 text: `${coll}`
+             }))
+         })
+         select_collection()
      })
     </script>
 </html>
