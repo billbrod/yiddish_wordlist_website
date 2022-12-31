@@ -285,6 +285,7 @@
      function generate_html_table(data) {
          var table = ''
          let index = 0
+         $('#vocabulary-table > tbody').empty()
          $.each(data['words'], function(word, word_data) {
              let classes = ''
              if (word_data['wiktionary'].length == 0) {

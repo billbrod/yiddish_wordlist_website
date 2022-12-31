@@ -13,6 +13,6 @@ TODO:
 - [ ] figure out column widths / heights
 - [ ] figure out indices: have duplicate rows for when sorting by index, how to display when not?
 - [X] figure out how to populate collection and title based on github repo
-- [ ] check what happens when the title changes -- I think it will add, so clear rows all out
+- [X] check what happens when the title changes -- I think it will add, so clear rows all out
 - [ ] add help on site
 - [ ] double check it looks good on phone
