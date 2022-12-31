@@ -226,7 +226,8 @@
              word_str += '</span>'
          }
          let classes = 'definition'
-         if (info['lexeme'] != stem && info['lexeme'] != transliteration) {
+         // stem can contain multiple words
+         if (stem.split(' ').indexOf(info['lexeme']) == -1  && info['lexeme'] != transliteration) {
              classes += ' extra_definition'
          }
          word_str += `<span class="${classes}">${info['text']}</span>`
