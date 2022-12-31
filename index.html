@@ -110,7 +110,7 @@
             <input type='checkbox' id='hide_undef_check' name='hide_undef_check' onclick="toggleHideUndef()">
         </div>
         <div id='hide_extra_defs'>
-            <label for='hide_extra_def_check'>Hide definitions beyond the first and examples: </label>
+            <label for='hide_extra_def_check'>Hide examples and related terms: </label>
             <input type='checkbox' id='hide_extra_def_check' name='hide_extra_def_check' onclick="toggleHideExtraDefs()">
         </div>
         <div>
@@ -211,29 +211,29 @@
          })
          toggleHideUndef()
      }
-     function format_ky_def(idx, word) {
-         let word_str = '<span class="lexeme">' + word['lexeme'] + '</span>'
-         if (word['partOfSpeech'] !== null || word['participle'] !== null || word['gender'] !== null || word['plural'] !== null ) {
+     function format_ky_def(idx, info, stem, transliteration) {
+         let word_str = '<span class="lexeme">' + info['lexeme'] + '</span>'
+         if (info['partOfSpeech'] !== null || info['participle'] !== null || info['gender'] !== null || info['plural'] !== null ) {
              word_str += '<span class="grammar">'
-             if (word['partOfSpeech'] !== null) {
-                 word_str += '<span class="pos">' + word['partOfSpeech'] + '</span>'
+             if (info['partOfSpeech'] !== null) {
+                 word_str += '<span class="pos">' + info['partOfSpeech'] + '</span>'
              }
-             if (word['participle'] !== null) {
-                 word_str += '<span class="participle">' + word['participle'] + '</span>'
+             if (info['participle'] !== null) {
+                 word_str += '<span class="participle">' + info['participle'] + '</span>'
              }
-             if (word['gender'] !== null) {
-                 word_str += '<span class="gender">' + word['gender'] + '</span>'
+             if (info['gender'] !== null) {
+                 word_str += '<span class="gender">' + info['gender'] + '</span>'
              }
-             if (word['plural'] !== null) {
-                 word_str += '<span class="plural">' + word['plural'] + '</span>'
+             if (info['plural'] !== null) {
+                 word_str += '<span class="plural">' + info['plural'] + '</span>'
              }
              word_str += '</span>'
          }
          let classes = 'definition'
-         if (idx > 0) {
+         if (info['lexeme'] != stem && info['lexeme'] != transliteration) {
              classes += ' extra_definition'
          }
-         word_str += `<span class="${classes}">${word['text']}</span>`
+         word_str += `<span class="${classes}">${info['text']}</span>`
          return word_str
      }
      function format_wikt_def(word) {
@@ -251,7 +251,7 @@
          }
          word_str += '<ol>'
          $.each(word['definitions'], function(idx, def) {
-             word_str += '<li>' + '<span class="lexeme">' + def['lexeme'] + '</span>'
+             word_str += `<li><span class="lexeme">${def['lexeme']}</span>`
              if (def['partOfSpeech'] !== null || def['participle'] !== null || def['gender'] !== null || def['plural'] !== null ) {
                  word_str += '<span class="grammar">'
                  if (def['partOfSpeech'] !== null) {
@@ -268,11 +268,7 @@
                  }
                  word_str += '</span>'
              }
-             let classes = 'definition'
-             if (idx > 0) {
-                 classes += ' extra_definition'
-             }
-             word_str += `<span class="${classes}">${def['text']}</span>`
+             word_str += `<span class="definition">${def['text']}</span>`
              if (def['examples'].length > 0 || def['relatedWords'].length > 0) {
                  word_str += '<ul>'
                  $.each(def['examples'], function(i, ex_word) {
@@ -323,7 +319,7 @@
              if (word_data['kentucky']['definitions'] !== undefined) {
                  word_data['kentucky']['definitions'].sort(function(a, b){return a['lexeme'].length-b['lexeme'].length})
                  $.each(word_data['kentucky']['definitions'], function(idx, info) {
-                     table += '<li>' + format_ky_def(idx, info) + '</li>'
+                     table += '<li>' + format_ky_def(idx, info, word_data['kentucky']['stem'], word_data['kentucky']['transliteration']) + '</li>'
                  } )
              }
              table += '</ol>'
