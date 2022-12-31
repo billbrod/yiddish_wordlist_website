@@ -117,12 +117,11 @@
         <div class="well">
             <div class="row" id="vocab-display">
                 <table  class="table table-condensed table-hover table-striped" id="vocabulary-table">
-                    <colgroup> <col> <col> <col> <col> <col> <col> </colgroup>
+                    <colgroup> <col> <col> <col> <col> <col> </colgroup>
                     <thead>
                         <tr>
                             <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">INDEX</th>
-                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">COUNT (STORY)</th>
-                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">FREQ (STORY)</th>
+                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">COUNT / FREQ (STORY)</th>
                             <th>WIKTIONARY</th>
                             <th>KENTUCKY</th>
                             <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">WORD</th>
@@ -295,8 +294,8 @@
              }
              table += `<tr id="${word}" class="${classes.trim()}">`;
              table += '<td>' + word_data['index'][0] + '</td>'
-             table += '<td>' + word_data['count (story)'] + '</td>'
-             table += '<td>' + (100 * parseFloat(word_data['frequency (story)'])).toFixed(2) + '%</td>'
+             freq = (100 * parseFloat(word_data['frequency (story)'])).toFixed(2)
+             table += `<td>${word_data['count (story)']} / ${freq}%</td>`
              table += '<td>'
              table += '<ol>'
              $.each(word_data['wiktionary'], function(idx, info) {
