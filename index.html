@@ -198,7 +198,7 @@
          dict_id.forEach(function(did) {
              let inputVal = document.getElementById(did).checked;
              let dict_name = did.replace('_check', '')
-             let dict_idx = Object({'wikt': 4, 'ky': 5})[dict_name]
+             let dict_idx = Object({'wikt': 3, 'ky': 4})[dict_name]
              if (inputVal) {
                  $(`td:nth-child(${dict_idx}),th:nth-child(${dict_idx})`).show();
              } else {
