@@ -113,6 +113,9 @@
         <div>
             <label for='total_words'>Words currently displayed: </label>
             <span id='total_words' name='total_words'></span>
+            <a> (total), </a>
+            <span id='unique_words' name='unique_words'></span>
+            <a> (unique)</a>
         </div>
         <div class="well">
             <div class="row" id="vocab-display">
@@ -161,6 +164,8 @@
      function updateDisplayedWords() {
          let displayedWords = $('tbody > tr:visible').length
          $('#total_words').text(displayedWords)
+         let uniqueWords = displayedWords - $('tbody > tr.extra_idx:visible').length
+         $('#unique_words').text(uniqueWords)
      }
      function toggleHideUndef() {
          let inputVal = document.getElementById('hide_undef_check').checked;
@@ -287,48 +292,60 @@
          let index = 0
          $('#vocabulary-table > tbody').empty()
          $.each(data['words'], function(word, word_data) {
-             let classes = ''
+             var row = ''
+             let classes = []
              if (word_data['wiktionary'].length == 0) {
-                 classes += 'undef_wikt '
+                 classes.push('undef_wikt')
              }
              if (word_data['kentucky'].length == 0) {
-                 classes += 'undef_ky'
+                 classes.push('undef_ky')
              }
-             table += `<tr id="${word}" class="${classes.trim()}">`;
-             table += '<td>' + word_data['index'][0] + '</td>'
+             row += `<tr id="{{id}}" class="{{class}}">`;
+             // row += '<td class="idx">' + word_data['index'][0] + '</td>'
+             row += '<td class="idx">{{idx}}</td>'
              freq = (100 * parseFloat(word_data['frequency (story)'])).toFixed(2)
-             table += `<td>${word_data['count (story)']} / ${freq}%</td>`
-             table += '<td>'
-             table += '<ol>'
+             row += `<td>${word_data['count (story)']} / ${freq}%</td>`
+             row += '<td>'
+             row += '<ol>'
              $.each(word_data['wiktionary'], function(idx, info) {
-                 table += format_wikt_def(info)
+                 row += format_wikt_def(info)
              })
-             table += '</ol>'
-             table += '</td>'
-             table += '<td>'
-             table += '<ul>'
+             row += '</ol>'
+             row += '</td>'
+             row += '<td>'
+             row += '<ul>'
              if (word_data['kentucky']['transliteration'] !== undefined) {
-                 table += '<li><span class="transliteration">' + word_data['kentucky']['transliteration'] + '</span></li>'
+                 row += '<li><span class="transliteration">' + word_data['kentucky']['transliteration'] + '</span></li>'
              }
              if (word_data['kentucky']['stem'] !== undefined) {
-                 table += '<li>stem: ' + word_data['kentucky']['stem'] + '</li>'
+                 row += '<li>stem: ' + word_data['kentucky']['stem'] + '</li>'
              }
-             table += '<ol>'
+             row += '<ol>'
              if (word_data['kentucky']['definitions'] !== undefined) {
                  word_data['kentucky']['definitions'].sort(function(a, b){return a['lexeme'].length-b['lexeme'].length})
                  $.each(word_data['kentucky']['definitions'], function(idx, info) {
-                     table += '<li>' + format_ky_def(idx, info, word_data['kentucky']['stem'], word_data['kentucky']['transliteration']) + '</li>'
+                     row += '<li>' + format_ky_def(idx, info, word_data['kentucky']['stem'], word_data['kentucky']['transliteration']) + '</li>'
                  } )
              }
-             table += '</ol>'
-             table += '</ul>'
-             table += '</td>'
-             table += '<td>' + word + '</td>'
-             table += '</tr>';
+             row += '</ol>'
+             row += '</ul>'
+             row += '</td>'
+             row += '<td>' + word + '</td>'
+             row += '</tr>';
              index++;
+             $.each(word_data['index'], function(i, idx) {
+                 if (i == 0) {
+                     table += row.replace('{{id}}', `${word}-${i}`)
+                                 .replace('{{idx}}', idx)
+                                 .replace('{{class}}', classes.join(' '))
+                 } else {
+                     table += row.replace('{{id}}', `${word}-${i}`)
+                                 .replace('{{idx}}', idx)
+                                 .replace('{{class}}', classes.concat('extra_idx').join(' '))
+                 }
+             })
          });
          $('#vocabulary-table > tbody:last-child').append(table);
-
      }
      // sort solution from https://stackoverflow.com/questions/59282842/how-to-make-sorting-html-tables-faster
      function sortTableRowsByColumn( table, columnIndex, ascending ) {
@@ -382,6 +399,12 @@
              delete th2.dataset['sort'];
          }
          th.dataset['sort'] = ascending ? 'asc' : 'desc';
+         if (th.textContent == 'INDEX') {
+             $('.extra_idx').show()
+         } else {
+             $('.extra_idx').hide()
+         }
+         updateDisplayedWords()
      }
 
      function create_table() {
@@ -394,6 +417,8 @@
              // of toggleDictionary
              toggleDictionary()
              toggleHideExtraDefs()
+             $('.extra_idx').hide()
+             updateDisplayedWords()
          })
      }
 

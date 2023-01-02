@@ -11,7 +11,7 @@ TODO:
 - [X] add toggle for dictionaries
 - [ ] add exclude list (and button to add to it) (plus buttons to add examples)
 - [ ] figure out column widths / heights
-- [ ] figure out indices: have duplicate rows for when sorting by index, how to display when not?
+- [X] figure out indices: have duplicate rows for when sorting by index, how to display when not?
 - [X] figure out how to populate collection and title based on github repo
 - [X] check what happens when the title changes -- I think it will add, so clear rows all out
 - [ ] add help on site
