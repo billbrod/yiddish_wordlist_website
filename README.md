@@ -9,7 +9,7 @@ TODO:
 - [X] add total word count
 - [X] add toggle to hide all but first definition / all examples
 - [X] add toggle for dictionaries
-- [ ] add exclude list (and button to add to it) (plus buttons to add examples)
+- [X] add exclude list (and button to add to it) (plus buttons to add examples)
 - [ ] figure out column widths / heights
 - [X] figure out indices: have duplicate rows for when sorting by index, how to display when not?
 - [X] figure out how to populate collection and title based on github repo

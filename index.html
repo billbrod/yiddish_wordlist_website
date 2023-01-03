@@ -14,6 +14,10 @@
 
     </head>
     <style>
+     .idx {
+         text-align: center;
+     }
+
      .text_select:after {
          content: "";
      }
@@ -86,6 +90,11 @@
      .related:before {content: " (";}
      .related:after {content: ")";}
 
+     textarea {
+         height:10px;
+         width: 40%;
+     }
+
     </style>
     <body>
         <h1>Yiddish vocabulary lists</h1>
@@ -117,12 +126,22 @@
             <span id='unique_words' name='unique_words'></span>
             <a> (unique)</a>
         </div>
+        <div>
+            <form action='javascript:updateExclude()'>
+                <label for='exclude_list'>Exclude the following words (comma-separated, press enter to update): </label>
+                <textarea id='exclude_list' name='exclude_list'></textarea>
+            </form>
+            <label for='exclude_articles'>   Some words you might want to exclude: </label>
+            <input name='exclude_articles' id='exclude_articles' type='button' value='Articles' onclick='exampleExclude(event);'>
+            <input name='exclude_pronouns' id='exclude_pronouns' type='button' value='Pronouns' onclick='exampleExclude(event);'>
+        </div>
         <div class="well">
             <div class="row" id="vocab-display">
                 <table  class="table table-condensed table-hover table-striped" id="vocabulary-table">
-                    <colgroup> <col> <col> <col> <col> <col> </colgroup>
+                    <colgroup> <col> <col> <col> <col> <col> <col> </colgroup>
                     <thead>
                         <tr>
+                            <th></th>
                             <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">INDEX</th>
                             <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">COUNT / FREQ (STORY)</th>
                             <th>WIKTIONARY</th>
@@ -137,6 +156,42 @@
 
     </body>
     <script>
+     function excludeWord(event) {
+         let word = event.target.id.replace('exclude_', '')
+         if ($('#exclude_list').val().length == 0) {
+             $('#exclude_list').val(word)
+         } else {
+             $('#exclude_list').val($('#exclude_list').val() + ',' + word)
+         }
+         updateExclude()
+     }
+     function exampleExclude(event) {
+         let button_id = event.target.id
+         if (button_id == 'exclude_articles') {
+             new_exclude = ['די', 'דאָס','דעם', 'דער', 'אַ' ,'אַן']
+         } else if (button_id == 'exclude_pronouns') {
+             new_exclude = ['איך', 'דו', '‎ער‎', 'זי‎', 'עס‎', 'מיר‎', 'דיר', 'אים‎', 'איר‎', 'מיך‎', 'דיך‎', 'זיי‎', 'אונדז‎', 'אײַך‎', 'מײַן', '‎דײַן', '‎זײַן‎', 'איר‎', 'זײַן‎', 'אונדזער‎', 'אײַער‎', 'זייער']
+         }
+         if ($('#exclude_list').val().length == 0) {
+             $('#exclude_list').val(new_exclude.join(','))
+         } else {
+             $('#exclude_list').val($('#exclude_list').val() + ',' + new_exclude.join(','))
+         }
+         updateExclude()
+     }
+
+     function updateExclude() {
+         $('.excluded').show().removeClass('excluded')
+         let excludedWords = $('#exclude_list').val().split(',')
+         if (excludedWords.length > 0 && excludedWords[0] != "") {
+             excludedWords.map(function(w) {
+                 console.log(w, $(`#${w}:visible`), $(`#${w}`))
+                 $(`#${w}:visible`).addClass('excluded').hide()
+             });
+         };
+         updateDisplayedWords()
+     }
+
      function select_collection() {
          let collection = $('#collection_select')[0].value;
          $('#title_select').empty()
@@ -300,8 +355,8 @@
              if (word_data['kentucky'].length == 0) {
                  classes.push('undef_ky')
              }
-             row += `<tr id="{{id}}" class="{{class}}">`;
-             // row += '<td class="idx">' + word_data['index'][0] + '</td>'
+             row += `<tr id="${word}" class="{{class}}">`;
+             row += `<td><input id='exclude_${word}' type='button' value='exclude' onclick='excludeWord(event);'></td>`
              row += '<td class="idx">{{idx}}</td>'
              freq = (100 * parseFloat(word_data['frequency (story)'])).toFixed(2)
              row += `<td>${word_data['count (story)']} / ${freq}%</td>`
@@ -335,12 +390,10 @@
              index++;
              $.each(word_data['index'], function(i, idx) {
                  if (i == 0) {
-                     table += row.replace('{{id}}', `${word}-${i}`)
-                                 .replace('{{idx}}', idx)
+                     table += row.replace('{{idx}}', idx)
                                  .replace('{{class}}', classes.join(' '))
                  } else {
-                     table += row.replace('{{id}}', `${word}-${i}`)
-                                 .replace('{{idx}}', idx)
+                     table += row.replace('{{idx}}', idx)
                                  .replace('{{class}}', classes.concat('extra_idx').join(' '))
                  }
              })
@@ -421,6 +474,13 @@
              updateDisplayedWords()
          })
      }
+
+     $('#exclude_list').keypress(function(e) {
+         if (e.keyCode == 13 && !e.shiftKey) {
+             e.preventDefault();
+             this.form.submit();
+         }
+     });
 
      $.getJSON("https://raw.githubusercontent.com/billbrod/yiddish_wordlist_data/main/contents.json", function(data) {
          window.contents = data;
