@@ -181,12 +181,15 @@
      }
 
      function updateExclude() {
-         $('.excluded').show().removeClass('excluded')
+         if ($('.extra_idx:visible').length > 0) {
+             $('.excluded').show().removeClass('excluded')
+         } else {
+             $('.excluded').not('.extra_idx').show().removeClass('excluded')
+         }
          let excludedWords = $('#exclude_list').val().split(',')
          if (excludedWords.length > 0 && excludedWords[0] != "") {
              excludedWords.map(function(w) {
-                 console.log(w, $(`#${w}:visible`), $(`#${w}`))
-                 $(`#${w}:visible`).addClass('excluded').hide()
+                 $(`#${w}`).addClass('excluded').hide()
              });
          };
          updateDisplayedWords()
@@ -224,7 +227,7 @@
      }
      function toggleHideUndef() {
          let inputVal = document.getElementById('hide_undef_check').checked;
-         let showExtraDefs = $('.extra_idx:visible').length > 0
+         let showExtraIdx = $('.extra_idx:visible').length > 0
          if (inputVal) {
              // if the displayed dictionaries change, we'll need to show some of
              // the currently-hidden rows
@@ -240,7 +243,7 @@
                     unhide_classes += `.undef_${dict}`
                  }
              })
-             if (showExtraDefs) {
+             if (showExtraIdx) {
                  $(`tr${unhide_classes}`).show();
              } else {
                  $(`tr${unhide_classes}`).not('.extra_idx').show();
