@@ -224,6 +224,7 @@
      }
      function toggleHideUndef() {
          let inputVal = document.getElementById('hide_undef_check').checked;
+         let showExtraDefs = $('.extra_idx:visible').length > 0
          if (inputVal) {
              // if the displayed dictionaries change, we'll need to show some of
              // the currently-hidden rows
@@ -239,7 +240,11 @@
                     unhide_classes += `.undef_${dict}`
                  }
              })
-             $(`tr${unhide_classes}`).show();
+             if (showExtraDefs) {
+                 $(`tr${unhide_classes}`).show();
+             } else {
+                 $(`tr${unhide_classes}`).not('.extra_idx').show();
+             }
              $(`tr${hide_classes}`).hide();
          } else {
              $('tr').show();
@@ -457,7 +462,7 @@
          } else {
              $('.extra_idx').hide()
          }
-         toggleDictionary()
+         toggleHideUndef()
          updateDisplayedWords()
      }
 
