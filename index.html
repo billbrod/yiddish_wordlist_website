@@ -438,6 +438,13 @@
 
      function onColumnHeaderClicked( ev ) {
          const th = ev.currentTarget;
+         if (th.textContent == 'INDEX') {
+             $('.extra_idx').show()
+         } else {
+             $('.extra_idx').hide()
+         }
+         toggleHideUndef()
+         updateDisplayedWords()
          const table = document.getElementById('vocabulary-table');
          const thIndex = Array.from( th.parentElement.children ).indexOf( th );
          const ascending = !( 'sort' in th.dataset ) || th.dataset.sort != 'asc';
@@ -457,13 +464,6 @@
              delete th2.dataset['sort'];
          }
          th.dataset['sort'] = ascending ? 'asc' : 'desc';
-         if (th.textContent == 'INDEX') {
-             $('.extra_idx').show()
-         } else {
-             $('.extra_idx').hide()
-         }
-         toggleHideUndef()
-         updateDisplayedWords()
      }
 
      function create_table() {
