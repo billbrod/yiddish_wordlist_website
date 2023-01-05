@@ -15,4 +15,5 @@ TODO:
 - [X] figure out how to populate collection and title based on github repo
 - [X] check what happens when the title changes -- I think it will add, so clear rows all out
 - [ ] add help on site
+- [ ] fix favicon paths
 - [ ] double check it looks good on phone
