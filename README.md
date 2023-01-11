@@ -17,3 +17,6 @@ TODO:
 - [ ] add help on site
 - [ ] fix favicon paths
 - [ ] double check it looks good on phone
+- [ ] see if I can use one of the other jochre [output
+      formats](https://github.com/urieli/jochre/wiki/Analysing-Yiddish) to line
+      up between book and wordlist
