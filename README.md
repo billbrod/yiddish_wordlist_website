@@ -17,3 +17,7 @@ TODO:
 - [ ] add help on site
 - [ ] fix favicon paths
 - [ ] double check it looks good on phone
+
+Switch to datatables?
+- [ ] need to change how hide/show of columns and rows works
+- [ ] better way to construct table?

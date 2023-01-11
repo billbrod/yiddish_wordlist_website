@@ -7,6 +7,8 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.css">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.js"></script>
         <link rel="apple-touch-icon" sizes="180x180" href="/yiddish-data/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="32x32" href="/yiddish-data/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/yiddish-data/favicon-16x16.png">
@@ -34,32 +36,6 @@
      /* set background color so it's not transparent when scrolling down */
      th {
          background: #f5f5f5;
-     }
-
-     /* add arrows, from https://stackoverflow.com/questions/17639562/add-sorting-arrows-to-th-like-table-sorter */
-     .headerSortDown:after,
-     .headerSortUp:after {
-         content: ' ';
-         position: relative;
-         left: 2px;
-         border: 6px solid transparent;
-     }
-
-     /* height of the element that contains this is too small, so we get a scroll bar. figure out how to remove that */
-     .headerSortDown:after {
-         top: 15px;
-         border-top-color: silver;
-     }
-
-     .headerSortUp:after {
-         bottom: 15px;
-         border-bottom-color: silver;
-     }
-
-     .headerSortDown,
-     .headerSortUp {
-         padding-right: 10px;
-         cursor: pointer;
      }
 
      .marg_left {
@@ -142,11 +118,11 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">INDEX</th>
-                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">COUNT / FREQ (STORY)</th>
+                            <th>INDEX</th>
+                            <th>COUNT / FREQ (STORY)</th>
                             <th>WIKTIONARY</th>
                             <th>KENTUCKY</th>
-                            <th onclick="onColumnHeaderClicked(event)" class="headerSortDown">WORD</th>
+                            <th>WORD</th>
                         </tr>
                         <tbody></tbody>
                     </thead>
@@ -408,36 +384,6 @@
          });
          $('#vocabulary-table > tbody:last-child').append(table);
      }
-     // sort solution from https://stackoverflow.com/questions/59282842/how-to-make-sorting-html-tables-faster
-     function sortTableRowsByColumn( table, columnIndex, ascending ) {
-
-         // only look at visible rows
-         const rows = $('tbody > tr').filter(":visible");
-         rows.sort( ( x, y ) => {
-             var xValue = x.cells[columnIndex].textContent;
-             // this should catch undefined, null, empty, and 0.
-             // https://www.w3docs.com/snippets/javascript/how-to-check-for-empty-undefined-null-string-in-javascript.html
-             if (!xValue) {
-                 // want undefined to always be at the end.
-                 xValue = ascending ?  Infinity : 0;
-             }
-             var yValue = y.cells[columnIndex].textContent;
-             if (!yValue) {
-                 yValue = ascending ? Infinity : 0;
-             }
-             if (!isNaN(xValue)) {
-                 const xNum = parseFloat( xValue );
-                 const yNum = parseFloat( yValue );
-                 return ascending ? ( xNum - yNum ) : ( yNum - xNum );
-             } else {
-                 return ascending ? xValue.localeCompare(yValue) : yValue.localeCompare(xValue);
-             }
-         } );
-
-         for( let row of rows ) {
-             table.tBodies[0].appendChild( row );
-         }
-     }
 
      function onColumnHeaderClicked( ev ) {
          const th = ev.currentTarget;
@@ -448,25 +394,6 @@
          }
          toggleHideUndef()
          updateDisplayedWords()
-         const table = document.getElementById('vocabulary-table');
-         const thIndex = Array.from( th.parentElement.children ).indexOf( th );
-         const ascending = !( 'sort' in th.dataset ) || th.dataset.sort != 'asc';
-         if (ascending) {
-             th.classList.remove('headerSortDown');
-             th.classList.add('headerSortUp');
-         } else {
-             th.classList.remove('headerSortUp');
-             th.classList.add('headerSortDown');
-         }
-         const start = performance.now();
-         sortTableRowsByColumn( table, thIndex, ascending );
-         const end = performance.now();
-         console.log( "Sorted table rows in %d ms.",  end - start );
-         const allTh = table.querySelectorAll( ':scope > thead > tr > th' );
-         for( let th2 of allTh ) {
-             delete th2.dataset['sort'];
-         }
-         th.dataset['sort'] = ascending ? 'asc' : 'desc';
      }
 
      function create_table() {
@@ -481,6 +408,17 @@
              toggleHideExtraDefs()
              $('.extra_idx').hide()
              updateDisplayedWords()
+             $('#vocabulary-table').DataTable({
+                 "pageLength": 30,
+                 "columns": [
+                     {"searchable": false, "orderable": false},
+                     {"searchable": false, "orderable": true},
+                     {"searchable": false, "orderable": true},
+                     {"searchable": true, "orderable": false},
+                     {"searchable": true, "orderable": false},
+                     {"searchable": true, "orderable": true},
+                 ]
+             })
          })
      }
 
