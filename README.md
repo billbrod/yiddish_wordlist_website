@@ -19,3 +19,6 @@ TODO:
 - [ ] sort by count column is broken
 - [ ] try using an established table framework (datatables? grid.js?)
 - [ ] double check it looks good on phone
+- [ ] see if I can use one of the other jochre [output
+      formats](https://github.com/urieli/jochre/wiki/Analysing-Yiddish) to line
+      up between book and wordlist
